@@ -32,6 +32,7 @@ if __name__ == '__main__':
     value = 9472599177802
 
     make_timer(al.sequential_search, value, students, key)
+    make_timer(al.sequential_search, value, sorted_students, key)
 
     tree = Tree(students[0])
     [tree.insert(student, key) for student in students[1:]]
