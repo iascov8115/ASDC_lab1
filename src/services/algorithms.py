@@ -37,21 +37,25 @@ def find_mid(low_val: int, high_val: int, value: int, low: int, high: int) -> in
 
 def interpolation_search(value: int | str, array: list[Student], key: str) -> Student | None:
     low, high = 0, len(array) - 1
+    low_val, high_val = getattr(array[low], key), getattr(array[high], key)
     if type(value) is int:
-        while getattr(array[low], key) < value < getattr(array[high], key):
-            if getattr(array[high], key) == getattr(array[low], key):
+        while low_val < value < high_val:
+            if high_val == low_val:
                 break
-            mid = find_mid(getattr(array[low], key), getattr(array[high], key), value, low, high)
-            if getattr(array[mid], key) < value:
+            mid = find_mid(low_val, high_val, value, low, high)
+            mid_val = getattr(array[mid], key)
+            if mid_val < value:
                 low = mid + 1
-            elif getattr(array[mid], key) > value:
+                low_val = getattr(array[low], key)
+            elif mid_val > value:
                 high = mid - 1
+                high_val = getattr(array[high], key)
             else:
                 return array[mid]
 
-        if getattr(array[low], key) == value:
+        if low_val == value:
             return array[low]
-        if getattr(array[high], key) == value:
+        if high_val == value:
             return array[high]
     else:
         low_val = convert_value_to_int(getattr(array[low], key))
@@ -83,24 +87,24 @@ def fibonacci_method(value: int | str, array: list[Student], key: str) -> Studen
     n = len(array)
     fib_m2 = 0
     fib_m1 = 1
-    fib_m = fib_m2 + fib_m1
+    fib_m3 = fib_m2 + fib_m1
 
-    while fib_m < n:
+    while fib_m3 < n:
         fib_m2 = fib_m1
-        fib_m1 = fib_m
-        fib_m = fib_m2 + fib_m1
+        fib_m1 = fib_m3
+        fib_m3 = fib_m2 + fib_m1
     offset = -1
-    while fib_m > 1:
+    while fib_m3 > 1:
         i = min(offset + fib_m2, n - 1)
         if getattr(array[i], key) < value:
-            fib_m = fib_m1
+            fib_m3 = fib_m1
             fib_m1 = fib_m2
-            fib_m2 = fib_m - fib_m1
+            fib_m2 = fib_m3 - fib_m1
             offset = i
         elif getattr(array[i], key) > value:
-            fib_m = fib_m2
+            fib_m3 = fib_m2
             fib_m1 = fib_m1 - fib_m2
-            fib_m2 = fib_m - fib_m1
+            fib_m2 = fib_m3 - fib_m1
         else:
             return array[i]
 

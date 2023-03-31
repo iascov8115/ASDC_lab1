@@ -9,9 +9,9 @@ class Student:
             firstname: str = 'empty',
             lastname: str = 'empty',
             faculty: str = 'empty',
-            year_of_birth: int = 0000,
-            year_of_enrollment: int = 0000,
-            idnp: int = 0000000000000
+            year_of_birth: int = 0,
+            year_of_enrollment: int = 0,
+            idnp: int = 0
     ):
         self.__firstname = firstname
         self.__lastname = lastname

@@ -24,14 +24,14 @@ class Tree:
         else:
             self.value = obj
 
-    def find_value(self, value:str|int, key:str):
+    def tree_search(self, value:str|int, key:str):
         if value < getattr(self.value, key):
             if self.left is None:
                 return None
-            return self.left.find_value(value, key)
+            return self.left.tree_search(value, key)
         elif value > getattr(self.value, key):
             if self.right is None:
                 return None
-            return self.right.find_value(value, key)
+            return self.right.tree_search(value, key)
         else:
             return self.value
