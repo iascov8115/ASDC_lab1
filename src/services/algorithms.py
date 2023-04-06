@@ -24,61 +24,31 @@ def binary_search(value: int, array: list[dict], key: str) -> dict | None:
     return None
 
 
-def convert_value_to_int(v: str) -> int:
-    nv = 0
-    for c in v:
-        nv += ord(c)
-    return nv
-
-
 def find_mid(low_val: int, high_val: int, value: int, low: int, high: int) -> int:
     return low + ((value - low_val) * (high - low)) // (high_val - low_val)
 
 
-def interpolation_search(value: int | str, array: list[Student], key: str) -> Student | None:
+def interpolation_search(value: int, array: list[Student], key: str) -> Student | None:
     low, high = 0, len(array) - 1
     low_val, high_val = getattr(array[low], key), getattr(array[high], key)
-    if type(value) is int:
-        while low_val < value < high_val:
-            if high_val == low_val:
-                break
-            mid = find_mid(low_val, high_val, value, low, high)
-            mid_val = getattr(array[mid], key)
-            if mid_val < value:
-                low = mid + 1
-                low_val = getattr(array[low], key)
-            elif mid_val > value:
-                high = mid - 1
-                high_val = getattr(array[high], key)
-            else:
-                return array[mid]
+    while low_val < value < high_val:
+        if high_val == low_val:
+            break
+        mid = find_mid(low_val, high_val, value, low, high)
+        mid_val = getattr(array[mid], key)
+        if mid_val < value:
+            low = mid + 1
+            low_val = getattr(array[low], key)
+        elif mid_val > value:
+            high = mid - 1
+            high_val = getattr(array[high], key)
+        else:
+            return array[mid]
 
-        if low_val == value:
-            return array[low]
-        if high_val == value:
-            return array[high]
-    else:
-        low_val = convert_value_to_int(getattr(array[low], key))
-        high_val = convert_value_to_int(getattr(array[high], key))
-        value = convert_value_to_int(value)
-        while low_val < value < high_val:
-            if high_val == low_val:
-                break
-            mid = find_mid(low_val, high_val, value, low, high)
-            mid_val = convert_value_to_int(getattr(array[mid], key))
-            if mid_val < value:
-                low = mid + 1
-                low_val = convert_value_to_int(getattr(array[low], key))
-            elif mid_val > value:
-                high = mid - 1
-                high_val = convert_value_to_int(getattr(array[high], key))
-            else:
-                return array[mid]
-
-        if low_val == value:
-            return array[low]
-        if high_val == value:
-            return array[high]
+    if low_val == value:
+        return array[low]
+    if high_val == value:
+        return array[high]
 
     return None
 

@@ -8,78 +8,30 @@ class Student:
             self,
             firstname: str = 'empty',
             lastname: str = 'empty',
-            faculty: str = 'empty',
+            faculty: str = Faculty.get_faculty_name(0),
             year_of_birth: int = 0,
             year_of_enrollment: int = 0,
             idnp: int = 0
     ):
-        self.__firstname = firstname
-        self.__lastname = lastname
-        self.__idnp = idnp
-        self.__year_of_enrollment = year_of_enrollment
-        self.__year_of_birth = year_of_birth
-        self.__faculty = Faculty.get_faculty_index(faculty)
+        self.firstname = firstname
+        self.lastname = lastname
+        self.idnp = idnp
+        self.year_of_enrollment = year_of_enrollment
+        self.year_of_birth = year_of_birth
+        self.faculty = Faculty.get_faculty_index(faculty)
 
-    def __copy__(self):
+    def __copy__(self) -> object:
         copy_instance = Student(
             firstname=self.firstname,
             lastname=self.lastname,
             idnp=self.idnp,
             year_of_enrollment=self.year_of_enrollment,
             year_of_birth=self.year_of_birth,
-            faculty=self.faculty
+            faculty=Faculty.get_faculty_name(self.faculty)
         )
         return copy_instance
 
-    @property
-    def firstname(self):
-        return self.__firstname
-
-    @firstname.setter
-    def firstname(self, value):
-        self.__firstname = value
-
-    @property
-    def lastname(self):
-        return self.__lastname
-
-    @lastname.setter
-    def lastname(self, value):
-        self.__lastname = value
-
-    @property
-    def faculty(self):
-        return self.__faculty
-
-    @faculty.setter
-    def faculty(self, value):
-        self.__faculty = value
-
-    @property
-    def year_of_birth(self):
-        return self.__year_of_birth
-
-    @year_of_birth.setter
-    def year_of_birth(self, value):
-        self.__year_of_birth = value
-
-    @property
-    def year_of_enrollment(self):
-        return self.__year_of_enrollment
-
-    @year_of_enrollment.setter
-    def year_of_enrollment(self, value):
-        self.__year_of_enrollment = value
-
-    @property
-    def idnp(self):
-        return self.__idnp
-
-    @idnp.setter
-    def idnp(self, value):
-        self.__idnp = value
-
-    def assign(self, other):
+    def assign(self, other) -> None:
         self.firstname = other.firstname
         self.lastname = other.lastname
         self.faculty = other.faculty
@@ -92,10 +44,10 @@ class Student:
                f'lastname: {self.lastname}, ' \
                f'faculty: {Faculty.get_faculty_name(self.faculty)}, ' \
                f'year of birth: {self.year_of_birth}, ' \
-               f'year of enrollment: {self.__year_of_enrollment}, ' \
+               f'year of enrollment: {self.year_of_enrollment}, ' \
                f'idnp: {self.idnp}'
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         if isinstance(other, Student):
             return self.firstname == other.firstname and \
                 self.lastname == other.lastname and \
@@ -106,20 +58,19 @@ class Student:
         return False
 
     @staticmethod
-    def read_from_stream(filename: str | None = None, reader=None, data=None):
-        return StudentSerializer.read(filename, reader, data)
+    def read_from_stream(reader, filename: str | None = None, data=None) -> list:
+        return StudentSerializer.read(reader, filename, data)
 
     @staticmethod
-    def write_in_stream(obj, filename: str, writer):
-        return StudentSerializer.write(obj, filename, writer)
+    def write_in_stream(array: list, writer=None, filename: str | None = None):
+        return StudentSerializer.write(array, writer, filename)
 
 
 class StudentSerializer:
     __compatible_formats: list[str] = ['.json', '.csv']
 
     @staticmethod
-    def read(filename: str | None = None, reader=None, data=None):
-        # to use a data dictionary instead of a file
+    def read(reader, filename: str | None, data):
         if filename is None and data is not None:
             return [
                 Student(
@@ -149,17 +100,13 @@ class StudentSerializer:
             raise Exception(f'{file_format} format is not compatible, use {StudentSerializer.__compatible_formats}')
 
     @staticmethod
-    def write(obj, filename, writer):
+    def write(array: list[Student], writer, filename: str | None):
+        if filename is None:
+            for student in array:
+                print(student)
+            return 1
         _, file_format = os.path.splitext(filename)
         if file_format in StudentSerializer.__compatible_formats:
-            dictionary = {
-                "first_name": obj.firstname,
-                "last_name": obj.lastname,
-                "year_of_birth": obj.year_of_birth,
-                "year_of_enrollment": obj.year_of_enrollment,
-                "idnp": obj.idnp,
-                "faculty": Faculty.get_faculty_name(obj.faculty)
-            }
             with open(filename, 'w', newline='') as file:
                 match file_format.lower():
                     case '.csv':
@@ -173,9 +120,21 @@ class StudentSerializer:
                         ]
                         writer = writer(file, fieldnames=fieldnames)
                         writer.writeheader()
-                        writer.writerow(dictionary)
+                        for student in array:
+                            writer.writerow(StudentSerializer.prepare(student))
                     case '.json':
-                        writer(dictionary, file)
+                        writer([StudentSerializer.prepare(student) for student in array], file)
                 return 1
 
         raise Exception(f'{file_format} format is not compatible, use {StudentSerializer.__compatible_formats}')
+
+    @staticmethod
+    def prepare(obj: Student) -> dict:
+        return {
+            "first_name": obj.firstname,
+            "last_name": obj.lastname,
+            "year_of_birth": obj.year_of_birth,
+            "year_of_enrollment": obj.year_of_enrollment,
+            "idnp": obj.idnp,
+            "faculty": Faculty.get_faculty_name(obj.faculty)
+        }
